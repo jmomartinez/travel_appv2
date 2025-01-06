@@ -143,8 +143,11 @@ def main():
 
     if st.button("Search Flights"):
         try:
+            st.write("Fetching flights...")
             results = fetch_flights(search_type, origin, destination, departure_date, return_date, search_range, direction)
+            st.write("Flight results received...")
             if search_type == 'Simple Search':
+                st.write("Entering Simple Search Flow...")
                 if "data" in results:
                     for idx, flight in enumerate(results["data"]):
                         flight_data = parse_flight_data(flight, results['dictionaries'])
@@ -157,6 +160,7 @@ def main():
                 else:
                     st.error("No flight data available.")
             elif search_type == 'Unidirectional Wide Search' or 'Bidirectional Wide Search':
+                st.write("Entering Unidirectional Search Flow...")
                 for k, flight_results in results.items():
                     if "data" in flight_results:
                         for idx, flight in enumerate(flight_results["data"]):
