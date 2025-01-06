@@ -1,0 +1,9 @@
+*.idea
+*.xml
+*.csv
+*.json
+#ipython notebook
+__pycache__/
+
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
