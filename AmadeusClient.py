@@ -1,4 +1,3 @@
-import os
 import operator
 import requests
 from datetime import datetime, timedelta
@@ -7,6 +6,8 @@ from dataclasses import dataclass
 
 @dataclass
 class FlightSearchParameters:
+    api_key: str
+    api_secret: str
     env: str
     version: str
     origin: str
@@ -37,17 +38,16 @@ class AmadeusFlightSearch:
             self.return_date = search_params.return_date
 
         self.flight_endpoint = self.FLIGHTS_ENDPOINT_TEMPLATE.replace('<version>', search_params.version)
+        self.auth_payload = (f"client_credentials&client_id={search_params.api_key}&"
+                                 f"&client_secret={search_params.api_secret}&grant_type=client_credentials")
 
         if search_params.env == 'test':
             self.auth_endpoint = self.AUTH_ENDPOINT_TEMPLATE.replace('<env>', 'test.')
             self.flight_endpoint = self.flight_endpoint.replace('<env>', 'test.')
-            self.auth_payload = (f"client_credentials&client_id={os.getenv('AMADEUS_TEST_API_KEY')}"
-                                 f"&client_secret={os.getenv('AMADEUS_TEST_API_SECRET')}&grant_type=client_credentials")
         elif search_params.env == 'prod':
             self.auth_endpoint = self.AUTH_ENDPOINT_TEMPLATE.replace('<env>', '')
             self.flight_endpoint = self.flight_endpoint.replace('<env>', '')
-            self.auth_payload = (f"client_credentials&client_id={os.getenv('AMADEUS_PROD_API_KEY')}"
-                                 f"&client_secret={os.getenv('AMADEUS_PROD_API_SECRET')}&grant_type=client_credentials")
+
         else:
             raise ValueError('Environment argument must be either "test" or "prod".')
 

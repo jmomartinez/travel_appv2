@@ -90,6 +90,8 @@ def display_flight_card(flight_data: dict, metadata: dict[str, str], itinerary_n
 def fetch_flights(search_type, origin, destination, departure_date, return_date, search_range, direction):
     # Adjust parameters based on search type
     params = FlightSearchParameters(
+        api_key=st.secrets["prod"]["AMADEUS_PROD_API_KEY"],
+        api_secret=st.secrets["prod"]["AMADEUS_PROD_API_SECRET"],
         env='prod',
         version='v2',
         origin=origin,
