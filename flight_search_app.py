@@ -5,35 +5,6 @@ from AmadeusClient import AmadeusFlightSearch, FlightSearchParameters
 from datetime import datetime
 from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, _get_next_day_arrival_str
 
-# # TODO: Clean this up/re-do this
-# # Function to parse the flight data
-# def parse_flight_data(flight, flight_metadata):
-#     """Extract all necessary data for the flight card and detailed itinerary."""
-#     segments, cabin_types = [], []
-#     for itinerary in flight["itineraries"]:
-#         for segment in itinerary["segments"]:
-#             segments.append(segment)
-#
-#     for pricing in flight['travelerPricings']:
-#         cabin_types = [pricing['fareDetailsBySegment'][i]['cabin'] for i in range(len(pricing['fareDetailsBySegment']))]
-#
-#     # Calculate total trip duration
-#     total_duration = calculate_duration(start=segments[0]["departure"]["at"], end=segments[-1]["arrival"]["at"])
-#
-#     # Extract stop information
-#     stops = len(segments) - 1
-#     stop_info = f"{stops} stop{'s' if stops > 1 else ''}" if stops > 0 else "nonstop"
-#
-#     # Extract airline
-#     airline = flight_metadata['carriers'][segments[0]["carrierCode"]]
-#
-#     # Extract price
-#     price = flight["price"]["grandTotal"]
-#     currency = flight["price"]["currency"]
-#
-#     return {"total_duration": total_duration, "stops": stop_info, "airline": airline,
-#             "price": price, "segments": segments,'cabin_types': cabin_types}
-
 # <img src="https://via.placeholder.com/32" alt="Airline Logo" style="width: 32px; height: 32px; margin-right: 10px;">
 # <div style="background-color: #0066ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">Best</div>
 
