@@ -2,6 +2,7 @@
 *.xml
 *.csv
 *.json
+*..streamlit
 #ipython notebook
 __pycache__/
 
