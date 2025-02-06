@@ -32,7 +32,6 @@ def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[st
     The function normalizes one-way offers by wrapping them in a list so that the same rendering
     logic applies to all cases.
     """
-    # TODO: Listing the flights and how many stops are included needs to get solved.
     left_html = ""
     for leg_key, leg in flight_legs.items():
         num_stops = len(leg) - 1
@@ -41,7 +40,7 @@ def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[st
         departure_time_str = get_flight_time(leg[0].departure_time)
         arrival_time_str = get_flight_time(leg[-1].arrival_time)
 
-        next_day_str = '+4'
+        next_day_str = ''
         duration_str = transform_duration_str(leg[0].total_duration)
         route_str = f"{leg[0].departure_airport} – {leg[-1].arrival_airport}"
 
@@ -140,17 +139,6 @@ def display_collapsable_card(flight_legs: dict[str, list[Segment]], carriers: di
 
 
 def get_time_difference(start_str: str, end_str: str) -> str:
-    """
-    Given two datetime strings in the format 'YYYY-MM-DDTHH:MM:SS',
-    returns the time difference formatted as "Xh Ym".
-
-    Parameters:
-        start_str (str): The start datetime as a string.
-        end_str (str): The end datetime as a string.
-
-    Returns:
-        str: The difference between the two times in the format "Xh Ym".
-    """
     start_dt = datetime.strptime(start_str, "%Y-%m-%dT%H:%M:%S")
     end_dt = datetime.strptime(end_str, "%Y-%m-%dT%H:%M:%S")
 
@@ -197,7 +185,7 @@ def fetch_flights(search_type, origin, destination, departure_date, return_date,
         raise ValueError(f"The search type: {search_type} is not supported.")
     return results
 
-def input_date_check(departure_date: datetime, return_date: datetime):
+def input_date_check(departure_date: datetime, return_date: datetime) -> None:
     # Validate the departure date
     if departure_date < datetime.now().date():
         st.error("Departure Date cannot be in the past. Please select a valid date.")
@@ -276,40 +264,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-# # Collapsible itinerary details
-# with st.expander("View Details", expanded=False):
-#     for i in range(len(flight_data["segments"])):
-#         airline = metadata['carriers'][flight_data["segments"][i]['carrierCode']].title()
-#         departure_time = clean_time_components(flight_data["segments"][i]["departure"]["at"])
-#         arrival_time = clean_time_components(flight_data["segments"][i]["arrival"]["at"])
-#         airline_number = flight_data["segments"][i]['number']
-#         airline_codes_str = f"{flight_data['segments'][i]['departure']['iataCode']} to {flight_data['segments'][i]['arrival']['iataCode']}"
-#
-#         # TODO: Add the cabin type to each card
-#         st.markdown(
-#             f"""
-#             <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #555; border-radius: 5px; background-color: #333;">
-#                 <p style="color: #aaa;">
-#                     <b>{airline_codes_str}</b> | <b>{airline}<b> <b>{airline_number}<b><br>
-#                     <b>{departure_time} - {arrival_time}<b> ({transform_duration(flight_data["segments"][i]['duration'])})<br>
-#                 </p>
-#             </div>
-#             """,
-#             unsafe_allow_html=True
-#         )
-#         if len(flight_data["segments"]) > 1 and i + 1 < len(flight_data["segments"]):
-#             layover_duration = calculate_duration(start=flight_data["segments"][i]["arrival"]["at"],
-#                                                 end=flight_data["segments"][i+1]["departure"]["at"])
-#             layover_duration = f"{layover_duration['hours']}h {layover_duration['minutes']:02d}m"
-#
-#             st.markdown(
-#                 f"""
-#                 <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #555; border-radius: 5px; background-color: #272727;">
-#                     <p style="color: #aaa;">
-#                         <b>{layover_duration} - Change Planes in {flight_data["segments"][i]['arrival']['iataCode']}<b><br>
-#                     </p>
-#                 </div>
-#                 """,
-#                 unsafe_allow_html=True
-#             )
 
