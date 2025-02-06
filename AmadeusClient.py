@@ -89,7 +89,7 @@ class AmadeusFlightSearch:
 
     def find_flights(self, url: str) -> dict[str, str]:
         try:
-            flight_results = requests.get(url, headers=self._get_headers(), timeout=90)
+            flight_results = requests.get(url, headers=self._get_headers(), timeout=30)
             flight_results.raise_for_status()
         except requests.exceptions.Timeout:
             raise SystemExit("The request timed out. Please try again.")
