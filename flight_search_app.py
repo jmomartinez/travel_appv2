@@ -173,16 +173,19 @@ def fetch_flights(search_type, origin, destination, departure_date, return_date,
         direction=direction if search_type == "Unidirectional Wide Search" else None
     )
 
-    # Initialize search object and perform the search
     amadeus_client = AmadeusFlightSearch(params)
-    if search_type == 'Simple Search':
-        results = amadeus_client.single_flight_search()
-    elif search_type == 'Unidirectional Wide Search':
-        results = amadeus_client.single_direction_bulk_flight_search(inclusive_search=True)
-    elif search_type == 'Bidirectional Wide Search':
-        results = amadeus_client.dual_direction_bulk_flight_search()
-    else:
-        raise ValueError(f"The search type: {search_type} is not supported.")
+
+    try:
+        if search_type == 'Simple Search':
+            results = amadeus_client.single_flight_search()
+        elif search_type == 'Unidirectional Wide Search':
+            results = amadeus_client.single_direction_bulk_flight_search(inclusive_search=True)
+        elif search_type == 'Bidirectional Wide Search':
+            results = amadeus_client.dual_direction_bulk_flight_search()
+        else:
+            raise ValueError(f"The search type: {search_type} is not supported.")
+    except Exception as e:
+        st.error('Something went wrong. Perhaps the airport codes are invalid?')
     return results
 
 def input_date_check(departure_date: datetime, return_date: datetime) -> None:
