@@ -1432,16 +1432,6 @@
     {
         "country_code": "AU",
         "region_name": "New South Wales",
-        "iata_code": "NOA",
-        "airport": "NAS Nowra",
-        "name": "Naval Air Station Nowra - HMAS Albatross",
-        "country_name": "Australia",
-        "municipality": "Nowra Hill",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "AU",
-        "region_name": "New South Wales",
         "iata_code": "NRA",
         "airport": "Narrandera Airport",
         "name": "Narrandera Airport",
@@ -11432,31 +11422,11 @@
     {
         "country_code": "DE",
         "region_name": "Hessen",
-        "iata_code": "FRZ",
-        "airport": "Fritzlar Air Base",
-        "name": "Fritzlar Army Airfield",
-        "country_name": "Germany",
-        "municipality": "Fritzlar",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "DE",
-        "region_name": "Hessen",
         "iata_code": "KSF",
         "airport": "Kassel Airport",
         "name": "Kassel Airport",
         "country_name": "Germany",
         "municipality": "Calden",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "DE",
-        "region_name": "Hessen",
-        "iata_code": "WIE",
-        "airport": "Wiesbaden Army Airfield",
-        "name": "Wiesbaden Army Airfield",
-        "country_name": "Germany",
-        "municipality": "Wiesbaden",
         "type": "medium_airport"
     },
     {
@@ -20822,16 +20792,6 @@
     {
         "country_code": "JP",
         "region_name": "Yamaguchi",
-        "iata_code": "IWK",
-        "airport": "Marine Corps Air Station Iwakuni",
-        "name": "Iwakuni Kintaikyo Airport / Marine Corps Air Station Iwakuni",
-        "country_name": "Japan",
-        "municipality": "Iwakuni",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "JP",
-        "region_name": "Yamaguchi",
         "iata_code": "UBJ",
         "airport": "Yamaguchi Ube Airport",
         "name": "Yamaguchi Ube Airport",
@@ -22477,16 +22437,6 @@
         "name": "Miandrivazo Airport",
         "country_name": "Madagascar",
         "municipality": "Miandrivazo",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "MH",
-        "region_name": "Kwajalein",
-        "iata_code": "KWA",
-        "airport": "Bucholz Army Airfield",
-        "name": "Bucholz Army Air Field",
-        "country_name": "Marshall Islands",
-        "municipality": "Kwajalein",
         "type": "medium_airport"
     },
     {
@@ -24641,16 +24591,6 @@
     },
     {
         "country_code": "NL",
-        "region_name": "Noord-Holland",
-        "iata_code": "DHR",
-        "airport": "De Kooy Airfield",
-        "name": "De Kooy Airfield / Den Helder Naval Air Station",
-        "country_name": "Netherlands",
-        "municipality": "Den Helder",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "NL",
         "region_name": "Overijssel",
         "iata_code": "ENS",
         "airport": "Enschede Airport Twente",
@@ -26347,16 +26287,6 @@
         "name": "Dr Juan C Angara Airport",
         "country_name": "Philippines",
         "municipality": "Baler",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "PH",
-        "region_name": "Bataan",
-        "iata_code": "SFS",
-        "airport": "Subic Bay International Airport",
-        "name": "Subic Bay International Airport / Naval Air Station Cubi Point",
-        "country_name": "Philippines",
-        "municipality": "Olongapo",
         "type": "medium_airport"
     },
     {
@@ -32632,16 +32562,6 @@
     {
         "country_code": "US",
         "region_name": "Alabama",
-        "iata_code": "HUA",
-        "airport": "Redstone Army Airfield",
-        "name": "Redstone Army Air Field",
-        "country_name": "United States",
-        "municipality": "Redstone Arsnl Huntsville",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Alabama",
         "iata_code": "MGM",
         "airport": "Montgomery Regional Airport (Dannelly Field)",
         "name": "Montgomery Regional (Dannelly Field) Airport",
@@ -32842,16 +32762,6 @@
     {
         "country_code": "US",
         "region_name": "Alaska",
-        "iata_code": "BIG",
-        "airport": "Allen Army Airfield",
-        "name": "Allen Army Airfield",
-        "country_name": "United States",
-        "municipality": "Delta Junction Ft Greely",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Alaska",
         "iata_code": "BRW",
         "airport": "Wiley Post-Will Rogers Memorial Airport",
         "name": "Wiley Post Will Rogers Memorial Airport",
@@ -33005,16 +32915,6 @@
         "iata_code": "FAI",
         "airport": "Fairbanks International Airport",
         "name": "Fairbanks International Airport",
-        "country_name": "United States",
-        "municipality": "Fairbanks",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Alaska",
-        "iata_code": "FBK",
-        "airport": "Ladd Army Airfield",
-        "name": "Ladd Army Airfield",
         "country_name": "United States",
         "municipality": "Fairbanks",
         "type": "medium_airport"
@@ -33402,16 +33302,6 @@
     {
         "country_code": "US",
         "region_name": "Alaska",
-        "iata_code": "SYA",
-        "airport": "Eareckson Air Station",
-        "name": "Eareckson Air Station",
-        "country_name": "United States",
-        "municipality": "Shemya",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Alaska",
         "iata_code": "TKA",
         "airport": "Talkeetna Airport",
         "name": "Talkeetna Airport",
@@ -33527,16 +33417,6 @@
         "name": "Bisbee Douglas International Airport",
         "country_name": "United States",
         "municipality": "Douglas Bisbee",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Arizona",
-        "iata_code": "FHU",
-        "airport": "Sierra Vista Municipal Airport (Libby Army Airfield)",
-        "name": "Sierra Vista Municipal Airport / Libby Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Huachuca / Sierra Vista",
         "type": "medium_airport"
     },
     {
@@ -33667,16 +33547,6 @@
         "name": "Tucson International Airport / Morris Air National Guard Base",
         "country_name": "United States",
         "municipality": "Tucson",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Arizona",
-        "iata_code": "YUM",
-        "airport": "Yuma International Airport / MCAS Yuma",
-        "name": "Yuma International Airport / Marine Corps Air Station Yuma",
-        "country_name": "United States",
-        "municipality": "Yuma",
         "type": "medium_airport"
     },
     {
@@ -33867,16 +33737,6 @@
         "name": "Hollywood Burbank Airport",
         "country_name": "United States",
         "municipality": "Burbank",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "California",
-        "iata_code": "BYS",
-        "airport": "Bicycle Lake Army Airfield (Fort Irwin)",
-        "name": "Bicycle Lake Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Irwin/Barstow",
         "type": "medium_airport"
     },
     {
@@ -34082,51 +33942,11 @@
     {
         "country_code": "US",
         "region_name": "California",
-        "iata_code": "NKX",
-        "airport": "MCAS Miramar",
-        "name": "Miramar Marine Corps Air Station - Mitscher Field",
-        "country_name": "United States",
-        "municipality": "San Diego",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "California",
-        "iata_code": "NLC",
-        "airport": "NAS Lemoore (Reeves Field)",
-        "name": "Lemoore Naval Air Station (Reeves Field) Airport",
-        "country_name": "United States",
-        "municipality": "Lemoore",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "California",
-        "iata_code": "NTD",
-        "airport": "NAS Point Mugu (Naval Base Ventura County)",
-        "name": "Point Mugu Naval Air Station (Naval Base Ventura Co)",
-        "country_name": "United States",
-        "municipality": "Point Mugu",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "California",
         "iata_code": "NUQ",
         "airport": "Moffett Federal Airfield",
         "name": "Moffett Federal Airfield",
         "country_name": "United States",
         "municipality": "Mountain View",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "California",
-        "iata_code": "NZY",
-        "airport": "NAS North Island (Halsey Field)",
-        "name": "North Island Naval Air Station-Halsey Field",
-        "country_name": "United States",
-        "municipality": "San Diego",
         "type": "medium_airport"
     },
     {
@@ -35022,51 +34842,11 @@
     {
         "country_code": "US",
         "region_name": "Florida",
-        "iata_code": "NIP",
-        "airport": "NAS Jacksonville (Towers Field)",
-        "name": "Jacksonville Naval Air Station (Towers Field)",
-        "country_name": "United States",
-        "municipality": "Jacksonville",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Florida",
-        "iata_code": "NPA",
-        "airport": "NAS Pensacola (Forrest Sherman Field)",
-        "name": "Naval Air Station Pensacola Forrest Sherman Field",
-        "country_name": "United States",
-        "municipality": "Pensacola",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Florida",
-        "iata_code": "NQX",
-        "airport": "NAS Key West (Boca Chica Field)",
-        "name": "Naval Air Station Key West/Boca Chica Field",
-        "country_name": "United States",
-        "municipality": "Key West",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Florida",
         "iata_code": "NRB",
         "airport": "NS Mayport (Admiral David L. McDonald Field)",
         "name": "Naval Station Mayport / Admiral David L McDonald Field",
         "country_name": "United States",
         "municipality": "Jacksonville",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Florida",
-        "iata_code": "NSE",
-        "airport": "NAS Whiting Field - North",
-        "name": "Whiting Field Naval Air Station - North",
-        "country_name": "United States",
-        "municipality": "Milton",
         "type": "medium_airport"
     },
     {
@@ -35322,16 +35102,6 @@
     {
         "country_code": "US",
         "region_name": "Georgia",
-        "iata_code": "LSF",
-        "airport": "Lawson Army Airfield",
-        "name": "Lawson Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Benning",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Georgia",
         "iata_code": "MCN",
         "airport": "Middle Georgia Regional Airport",
         "name": "Middle Georgia Regional Airport",
@@ -35387,16 +35157,6 @@
         "name": "St Simons Island Airport",
         "country_name": "United States",
         "municipality": "St Simons Island",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Georgia",
-        "iata_code": "SVN",
-        "airport": "Hunter Army Airfield",
-        "name": "Hunter Army Air Field",
-        "country_name": "United States",
-        "municipality": "Savannah",
         "type": "medium_airport"
     },
     {
@@ -36082,16 +35842,6 @@
     {
         "country_code": "US",
         "region_name": "Kansas",
-        "iata_code": "FRI",
-        "airport": "Marshall Army Airfield",
-        "name": "Marshall Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Riley (Junction City)",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Kansas",
         "iata_code": "GCK",
         "airport": "Garden City Regional Airport",
         "name": "Garden City Regional Airport",
@@ -36222,26 +35972,6 @@
     {
         "country_code": "US",
         "region_name": "Kentucky",
-        "iata_code": "FTK",
-        "airport": "Godman Army Airfield",
-        "name": "Godman Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Knox",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Kentucky",
-        "iata_code": "HOP",
-        "airport": "Campbell Army Airfield",
-        "name": "Campbell Army Airfield (Fort Campbell)",
-        "country_name": "United States",
-        "municipality": "Fort Campbell",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Kentucky",
         "iata_code": "LEX",
         "airport": "Blue Grass Airport",
         "name": "Blue Grass Airport",
@@ -36362,16 +36092,6 @@
     {
         "country_code": "US",
         "region_name": "Louisiana",
-        "iata_code": "ESF",
-        "airport": "Esler Airfield (Esler Regional Airport)",
-        "name": "Esler Army Airfield / Esler Regional Airport",
-        "country_name": "United States",
-        "municipality": "Alexandria",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Louisiana",
         "iata_code": "LCH",
         "airport": "Lake Charles Regional Airport",
         "name": "Lake Charles Regional Airport",
@@ -36427,16 +36147,6 @@
         "name": "Lakefront Airport",
         "country_name": "United States",
         "municipality": "New Orleans",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Louisiana",
-        "iata_code": "POE",
-        "airport": "Polk Army Airfield",
-        "name": "Polk Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Polk",
         "type": "medium_airport"
     },
     {
@@ -36552,16 +36262,6 @@
     {
         "country_code": "US",
         "region_name": "Maryland",
-        "iata_code": "APG",
-        "airport": "Phillips Army Airfield",
-        "name": "Phillips Army Air Field",
-        "country_name": "United States",
-        "municipality": "Aberdeen",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Maryland",
         "iata_code": "BWI",
         "airport": "Baltimore/Washington International Airport",
         "name": "Baltimore/Washington International Thurgood Marshall Airport",
@@ -36597,16 +36297,6 @@
         "name": "Martin State Airport",
         "country_name": "United States",
         "municipality": "Baltimore",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Maryland",
-        "iata_code": "NHK",
-        "airport": "NAS Patuxent River (Trapnell Field)",
-        "name": "Patuxent River Naval Air Station (Trapnell Field)",
-        "country_name": "United States",
-        "municipality": "Patuxent River",
         "type": "medium_airport"
     },
     {
@@ -37752,16 +37442,6 @@
     {
         "country_code": "US",
         "region_name": "Nevada",
-        "iata_code": "NFL",
-        "airport": "NAS Fallon (Van Voorhis Field)",
-        "name": "Fallon Naval Air Station",
-        "country_name": "United States",
-        "municipality": "Fallon",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Nevada",
         "iata_code": "RNO",
         "airport": "Reno-Tahoe International Airport",
         "name": "Reno Tahoe International Airport",
@@ -38392,16 +38072,6 @@
     {
         "country_code": "US",
         "region_name": "North Carolina",
-        "iata_code": "ECG",
-        "airport": "Elizabeth City Regional Airport",
-        "name": "Elizabeth City Regional Airport & Coast Guard Air Station",
-        "country_name": "United States",
-        "municipality": "Elizabeth City",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "North Carolina",
         "iata_code": "EWN",
         "airport": "Coastal Carolina Regional Airport",
         "name": "Coastal Carolina Regional Airport",
@@ -38417,16 +38087,6 @@
         "name": "Fayetteville Regional Airport - Grannis Field",
         "country_name": "United States",
         "municipality": "Fayetteville",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "North Carolina",
-        "iata_code": "FBG",
-        "airport": "Simmons Army Airfield",
-        "name": "Simmons Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Bragg",
         "type": "medium_airport"
     },
     {
@@ -38882,16 +38542,6 @@
     {
         "country_code": "US",
         "region_name": "Oklahoma",
-        "iata_code": "FSI",
-        "airport": "Henry Post Army Airfield (Fort Sill)",
-        "name": "Henry Post Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Sill",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Oklahoma",
         "iata_code": "GUY",
         "airport": "Guymon Municipal Airport",
         "name": "Guymon Municipal Airport",
@@ -39317,16 +38967,6 @@
         "name": "Harrisburg International Airport",
         "country_name": "United States",
         "municipality": "Harrisburg",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Pennsylvania",
-        "iata_code": "MUI",
-        "airport": "Muir Army Airfield",
-        "name": "Muir Army Air Field (Fort Indiantown Gap) Airport",
-        "country_name": "United States",
-        "municipality": "Fort Indiantown Gap(Annville)",
         "type": "medium_airport"
     },
     {
@@ -39792,16 +39432,6 @@
     {
         "country_code": "US",
         "region_name": "Texas",
-        "iata_code": "BIF",
-        "airport": "Biggs Army Airfield",
-        "name": "Biggs Army Air Field (Fort Bliss)",
-        "country_name": "United States",
-        "municipality": "Fort Bliss/El Paso",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Texas",
         "iata_code": "BPT",
         "airport": "Jack Brooks Regional Airport",
         "name": "Jack Brooks Regional Airport",
@@ -39992,16 +39622,6 @@
     {
         "country_code": "US",
         "region_name": "Texas",
-        "iata_code": "GRK",
-        "airport": "Killeen-Fort Hood Regional Airport / Robert Gray Army Airfield",
-        "name": "Killeen Regional Airport / Robert Gray Army Airfield",
-        "country_name": "United States",
-        "municipality": "Fort Cavazos",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Texas",
         "iata_code": "HOU",
         "airport": "William P. Hobby Airport",
         "name": "William P Hobby Airport",
@@ -40117,26 +39737,6 @@
         "name": "McAllen Miller International Airport",
         "country_name": "United States",
         "municipality": "McAllen",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Texas",
-        "iata_code": "NGP",
-        "airport": "NAS Corpus Christi (Truax Field)",
-        "name": "Naval Air Station Corpus Christi Truax Field",
-        "country_name": "United States",
-        "municipality": "Corpus Christi",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Texas",
-        "iata_code": "NQI",
-        "airport": "NAS Kingsville",
-        "name": "Kingsville Naval Air Station",
-        "country_name": "United States",
-        "municipality": "Kingsville",
         "type": "medium_airport"
     },
     {
@@ -40412,16 +40012,6 @@
     {
         "country_code": "US",
         "region_name": "Virginia",
-        "iata_code": "DAA",
-        "airport": "Davison Army Airfield",
-        "name": "Davison Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Belvoir",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Virginia",
         "iata_code": "DAN",
         "airport": "Danville Regional Airport",
         "name": "Danville Regional Airport",
@@ -40438,16 +40028,6 @@
         "country_name": "United States",
         "municipality": "Washington",
         "type": "large_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Virginia",
-        "iata_code": "FAF",
-        "airport": "Felker Army Airfield",
-        "name": "Felker Army Air Field",
-        "country_name": "United States",
-        "municipality": "Newport News (Fort Eustis)",
-        "type": "medium_airport"
     },
     {
         "country_code": "US",
@@ -40487,26 +40067,6 @@
         "name": "Norfolk Naval Station (Chambers Field)",
         "country_name": "United States",
         "municipality": "Norfolk",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Virginia",
-        "iata_code": "NTU",
-        "airport": "NAS Oceana (Apollo Soucek Field)",
-        "name": "Oceana Naval Air Station",
-        "country_name": "United States",
-        "municipality": "Virginia Beach",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Virginia",
-        "iata_code": "NYG",
-        "airport": "MCAF Quantico (Turner Field)",
-        "name": "Quantico Marine Corps Airfield / Turner Field",
-        "country_name": "United States",
-        "municipality": "Quantico",
         "type": "medium_airport"
     },
     {
@@ -40642,16 +40202,6 @@
     {
         "country_code": "US",
         "region_name": "Washington",
-        "iata_code": "GRF",
-        "airport": "Gray Army Airfield",
-        "name": "Gray Army Air Field",
-        "country_name": "United States",
-        "municipality": "Fort Lewis/Tacoma",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Washington",
         "iata_code": "HQM",
         "airport": "Bowerman Airport",
         "name": "Bowerman Airport",
@@ -40677,16 +40227,6 @@
         "name": "Grant County International Airport",
         "country_name": "United States",
         "municipality": "Moses Lake",
-        "type": "medium_airport"
-    },
-    {
-        "country_code": "US",
-        "region_name": "Washington",
-        "iata_code": "NUW",
-        "airport": "NAS Whidbey Island (Ault Field)",
-        "name": "Whidbey Island Naval Air Station (Ault Field)",
-        "country_name": "United States",
-        "municipality": "Oak Harbor",
         "type": "medium_airport"
     },
     {
