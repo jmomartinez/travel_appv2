@@ -1,4 +1,6 @@
+import json
 import streamlit as st
+from rapidfuzz import fuzz, utils
 import textwrap
 import streamlit.components.v1 as components
 from AmadeusClient import AmadeusFlightSearch, FlightSearchParameters
@@ -188,12 +190,13 @@ def fetch_flights(search_type, origin, destination, departure_date, return_date,
         st.error('Something went wrong. Perhaps the airport codes are invalid?')
     return results
 
-def input_date_check(departure_date: datetime, return_date: datetime) -> None:
+def input_departure_date_check(departure_date: datetime) -> None:
     # Validate the departure date
     if departure_date < datetime.now().date():
         st.error("Departure Date cannot be in the past. Please select a valid date.")
         st.stop()  # Stop execution until the user provides a valid date
 
+def input_return_after_departure_check(departure_date: datetime, return_date: datetime) -> None:
     # Validate the return date
     if return_date and return_date < departure_date:
         st.error("Return Date cannot be before the Departure Date. Please select a valid date.")
@@ -217,18 +220,79 @@ def get_alternative_airport_codes(airport_city_map: dict) -> dict:
             alternative_airports[v['cityCode']] = k
     return alternative_airports
 
-def main():
-    st.title("Flight Search Engine")
+def group_airports_by_municipality(airport_data: list[dict]) -> dict:
+    city_airport_data = dict()
+    for airport_details in airport_data:
+        new_key_name = f"{airport_details['municipality']}, {airport_details['country_code']}"
+        if new_key_name in city_airport_data.keys():
+            city_airport_data[new_key_name]['iata_codes'].append(airport_details.get('iata_code'))
+            city_airport_data[new_key_name]['airport_names'].append(airport_details.get('name'))
+            city_airport_data[new_key_name]['country_codes'].append(airport_details.get('country_code'))
+        else:
+            temp_dict = {'iata_codes': [airport_details.get('iata_code')], 'airport_names': [airport_details.get('name')], 'country_codes': [airport_details.get('country_code')]}
+            city_airport_data[new_key_name] = temp_dict
+    return city_airport_data
 
-    # User Input Fields
+def simple_string_comparison(string1: str, string2: str) -> float:
+    return fuzz.token_set_ratio(string1, string2, processor=utils.default_process)
+
+def get_city_airport_suggestions(query: str, city_airport_data: dict, threshold: float):
+    suggestions = dict()
+    for city, airport_stuff in city_airport_data.items():
+        if simple_string_comparison(query, city) >= threshold:
+            suggestions.update({city: airport_stuff})
+    return suggestions
+
+def aggregate_airport_suggestions(suggestions: dict) -> dict[str, str]:
+    suggested_iata_codes = [airport for v in suggestions.values() for airport in v['iata_codes']]
+    suggested_country_codes = [airport for v in suggestions.values() for airport in v['country_codes']]
+    suggested_airports = [airport for v in suggestions.values() for airport in v['airport_names']]
+    airport_suggestions = list(zip(suggested_airports, suggested_country_codes, suggested_iata_codes))
+    return dict(zip([f"{airport}, {country} ({iata})" for airport, country, iata in airport_suggestions], suggested_iata_codes))
+
+def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict):
+    if user_input:
+        if user_input in full_airport_to_iata.keys():
+            st.write(f"Selected Airport: {full_airport_to_iata[user_input.upper()]}")
+            return user_input
+        else:
+            suggestions = get_city_airport_suggestions(query=user_input, city_airport_data=city_airport_data, threshold=90)
+            final_airport_suggestions = aggregate_airport_suggestions(suggestions)
+
+            if final_airport_suggestions:
+                selected_airport = st.selectbox("Select a suggested city:", options=final_airport_suggestions.keys())
+                airport_iata_code = final_airport_suggestions.get(selected_airport)
+                st.write(f"Selected Airport: {selected_airport}")
+                return airport_iata_code
+            else:
+                st.write("No matching airport found. Perhaps you misspelled it?")
+
+def main():
+    with open('data/airports_data.json', 'r') as infile:
+        airport_data = json.load(infile)
+    full_airport_to_iata = {details['iata_code']: f"{details['name']}, {details['country_code']} ({details['iata_code']})" for details in airport_data}
+    city_airport_data = group_airports_by_municipality(airport_data)
+
+    st.title("Flight Search Engine")
     st.header("Search Flights")
-    origin = st.text_input("Origin (e.g. SFO)", "SFO").upper()
-    destination = st.text_input("Destination (e.g. JFK)", "JFK").upper()
-    departure_date = st.date_input("Departure Date")
+
+    # TODO: Add a check here in case the user inputs no origin or destination
+    origin = st.text_input("From? (City or Airport Code)").upper()
+    origin = check_user_airport_input(origin, city_airport_data, full_airport_to_iata)
+
+    destination = st.text_input("To? (City or Airport Code)").upper()
+    destination = check_user_airport_input(destination, city_airport_data, full_airport_to_iata)
+
+    departure_date = st.date_input("Departure Date", value=None)
     return_date = st.date_input("Return Date (optional)", value=None)
 
     major_stops = [origin, destination]
-    input_date_check(departure_date, return_date)
+
+    if departure_date:
+        input_departure_date_check(departure_date)
+    if departure_date and return_date:
+        input_return_after_departure_check(departure_date, return_date)
+
     # Dropdown to select search type
     search_type = st.selectbox(
         "Select Search Type",
