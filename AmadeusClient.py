@@ -13,10 +13,10 @@ class FlightSearchParameters:
     origin: str
     destination: str
     departure_date: str
+    adults_passengers: int
     return_date: str = None
     search_range: int = None
     direction: str = None
-
 
 class AmadeusFlightSearch:
     DATE_FORMAT = "%Y-%m-%d"
@@ -65,7 +65,7 @@ class AmadeusFlightSearch:
             'originLocationCode': self.search_params.origin,
             'destinationLocationCode': self.search_params.destination,
             'departureDate': str(departure_date.date()),
-            'adults': 1,
+            'adults': self.search_params.adults_passengers,
             'children': 0,
             'infants': 0,
             'travelClass': 'ECONOMY',  # ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST

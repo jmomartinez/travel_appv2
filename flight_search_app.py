@@ -4,7 +4,7 @@ from rapidfuzz import fuzz, utils
 import textwrap
 import streamlit.components.v1 as components
 from AmadeusClient import AmadeusFlightSearch, FlightSearchParameters
-from datetime import datetime
+from datetime import datetime, timedelta
 from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, \
     _get_next_day_arrival_str, Segment
 
@@ -183,8 +183,8 @@ def get_card_height(leg_num: int) -> int:
     return base_height + additional_height_per_segment * (leg_num - 1)
 
 
-def fetch_flights(search_type: str, origin: str, destination: str, departure_date, return_date, search_range: int,
-                  direction: str) -> dict:
+def fetch_flights(search_type: str, origin: str, destination: str, departure_date: str, return_date: str,
+                  num_of_passengers: int, search_range: int, direction: str, env: str = 'prod', version: str = 'v2') -> dict:
     """
     Fetches flight search results using the AmadeusFlightSearch client based on user input parameters.
     :param search_type: Type of search (e.g., "Simple Search", "Unidirectional Wide Search", "Bidirectional Wide Search").
@@ -194,16 +194,20 @@ def fetch_flights(search_type: str, origin: str, destination: str, departure_dat
     :param return_date: Return date as a datetime object (if applicable).
     :param search_range: Search range in days for wide searches (if applicable).
     :param direction: Direction indicator for wide search ("Earlier" or "Later") if applicable.
+    :param env: Environment code for amadeus search ("prod" or "test").
+    :param version: Version code for amadeus search (v2 default for the FlightSearch endpoint).
+    :param num_of_passengers: Number of flight passengers.
     :return: A dictionary containing the flight search results.
     """
     params = FlightSearchParameters(
         api_key=st.secrets["prod"]["AMADEUS_PROD_API_KEY"],
         api_secret=st.secrets["prod"]["AMADEUS_PROD_API_SECRET"],
-        env='prod',
-        version='v2',
+        env=env,
+        version=version,
         origin=origin,
         destination=destination,
         departure_date=departure_date.strftime("%Y-%m-%d"),
+        adults_passengers=num_of_passengers,
         return_date=return_date.strftime("%Y-%m-%d") if return_date else None,
         search_range=search_range if search_type != "Simple Search" else None,
         direction=direction if search_type == "Unidirectional Wide Search" else None
@@ -223,30 +227,6 @@ def fetch_flights(search_type: str, origin: str, destination: str, departure_dat
     except Exception as e:
         st.error('Something went wrong. Perhaps the airport codes are invalid?')
     return results
-
-
-def input_departure_date_check(departure_date: datetime) -> None:
-    """
-    Validates that the departure date is not in the past.
-    :param departure_date: Departure date as a datetime object.
-    :return: None. Displays an error and stops execution if the date is in the past.
-    """
-    if departure_date < datetime.now().date():
-        st.error("Departure Date cannot be in the past. Please select a valid date.")
-        st.stop()  # Stop execution until the user provides a valid date
-
-
-def input_return_after_departure_check(departure_date: datetime, return_date: datetime) -> None:
-    """
-    Validates that the return date is not before the departure date.
-    :param departure_date: Departure date as a datetime object.
-    :param return_date: Return date as a datetime object.
-    :return: None. Displays an error and stops execution if the return date is before the departure date.
-    """
-    if return_date and return_date < departure_date:
-        st.error("Return Date cannot be before the Departure Date. Please select a valid date.")
-        st.stop()  # Stop execution until the user provides a valid date
-
 
 def update_major_stops(major_stops: list, alternative_airports: dict, locations: dict) -> list[str]:
     """
@@ -342,7 +322,7 @@ def aggregate_airport_suggestions(suggestions: dict) -> dict[str, str]:
         zip([f"{airport}, {country} ({iata})" for airport, country, iata in airport_suggestions], suggested_iata_codes))
 
 
-def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict) -> None:
+def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict) -> str:
     """
     Validates the user's airport input. If the input directly matches a key in the provided dictionary, it is accepted;
     otherwise, it presents suggested cities based on fuzzy matching.
@@ -376,39 +356,30 @@ def get_flight_search_parameters(city_airport_data: dict, full_airport_to_iata: 
     :param full_airport_to_iata: Dictionary mapping full airport strings to IATA codes.
     :return: A tuple containing the origin, destination, departure date, return date, and major stops.
     """
+    # TODO: Look into the autocomplete parameter for text inputs
     origin = st.text_input("From? (City or Airport Code)").upper()
     origin = check_user_airport_input(origin, city_airport_data, full_airport_to_iata)
 
     destination = st.text_input("To? (City or Airport Code)").upper()
     destination = check_user_airport_input(destination, city_airport_data, full_airport_to_iata)
 
-    departure_date = st.date_input("Departure Date", value=None)
-    return_date = st.date_input("Return Date (optional)", value=None)
+    departure_date = st.date_input("Departure Date", value='today', min_value='today')
+    return_date = st.date_input("Return Date (Optional)", value=None, min_value=departure_date + timedelta(days=1))
 
-    major_stops = [origin, destination]
-
-    if departure_date:
-        input_departure_date_check(departure_date)
-    if departure_date and return_date:
-        input_return_after_departure_check(departure_date, return_date)
-    return origin, destination, departure_date, return_date, major_stops
+    num_of_passengers = st.number_input("Adult Passengers", value=1, min_value=1, max_value=25)
+    return origin, destination, departure_date, return_date, num_of_passengers, [origin, destination]
 
 
-def check_minimum_search_info(origin, destination, departure_date) -> None:
+def confirm_origin_and_destination_provided(origin: str, destination: str) -> None:
     """
     Ensures that the minimum required search information (origin, destination, departure date) is provided.
     :param origin: The origin airport code.
     :param destination: The destination airport code.
-    :param departure_date: The departure date.
     :return: None. Displays an error and stops execution if any required field is missing.
     """
     if not origin or not destination:
         st.error("No origin or destination provided. Please enter a valid city name or airport code.")
         st.stop()
-    if not departure_date:
-        st.error("No departure date provided. Please enter a valid departure date.")
-        st.stop()
-
 
 def display_simple_search_results(search_results: dict, major_stops: list[str]) -> None:
     """
@@ -431,7 +402,7 @@ def display_simple_search_results(search_results: dict, major_stops: list[str]) 
         else:
             st.error("No flight data available.")
     except Exception as e:
-        st.error(f"Uh oh something went wrong. Error for the nerds: {e}")
+        st.exception(f"Uh oh something went wrong. Error for the nerds: {e}")
         st.stop()
 
 
@@ -458,8 +429,8 @@ def main():
     st.title("Flight Search Engine")
     st.header("Search Flights")
 
-    origin, destination, departure_date, return_date, major_stops = get_flight_search_parameters(city_airport_data,
-                                                                                                 full_airport_to_iata)
+    (origin, destination, departure_date, return_date,
+     num_of_passengers, major_stops) = get_flight_search_parameters(city_airport_data, full_airport_to_iata)
 
     search_type = st.selectbox("Select Search Type", options=["Simple Search", "Unidirectional Wide Search (WIP)",
                                                               "Bidirectional Wide Search (WIP)"])
@@ -471,13 +442,14 @@ def main():
     elif search_type == "Bidirectional Wide Search":
         search_range = st.number_input("Search Range (in days)", min_value=1, step=1)
 
-    if st.button("Search Flights"):
-        check_minimum_search_info(origin, destination, departure_date)
-        if search_type == 'Simple Search':
-            st.write("Finding the cheapest flights, hang tight!")
-            search_results = fetch_flights(search_type, origin, destination, departure_date, return_date, search_range,
-                                           direction)
-            display_simple_search_results(search_results, major_stops)
+    with st.spinner():
+        if st.button("Search Flights"):
+            confirm_origin_and_destination_provided(origin, destination)
+            if search_type == 'Simple Search':
+                st.write("Finding the cheapest flights, hang tight!")
+                search_results = fetch_flights(search_type, origin, destination, departure_date, return_date,
+                                               num_of_passengers, search_range, direction)
+                display_simple_search_results(search_results, major_stops)
 
 
 if __name__ == '__main__':
