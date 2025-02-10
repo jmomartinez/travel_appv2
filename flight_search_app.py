@@ -308,6 +308,13 @@ def main():
         search_range = st.number_input("Search Range (in days)", min_value=1, step=1)
 
     if st.button("Search Flights"):
+        if not origin or not destination:
+            st.error("No origin or destination provided. Please enter a valid city name or airport code.")
+            st.stop()
+        if not departure_date:
+            st.error("No departure date provided. Please enter a valid departure date.")
+            st.stop()
+
         try:
             st.write("Fetching flights...")
             search_results = fetch_flights(search_type, origin, destination, departure_date, return_date, search_range, direction)
@@ -327,6 +334,7 @@ def main():
                     st.error("No flight data available.")
         except Exception as e:
             st.error(f"An error occurred: {e}")
+            st.stop()
 
 if __name__ == '__main__':
     main()

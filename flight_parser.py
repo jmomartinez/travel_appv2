@@ -26,7 +26,6 @@ def get_cabin_type(flight_offer: dict, segment_id: str) -> str:
             return fair_details_segment['cabin']
     return 'Cabin Type'
 
-
 def transform_duration_str(duration: str) -> str:
     match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?', duration)
     if match:

@@ -88,7 +88,6 @@ class AmadeusFlightSearch:
         return {'Authorization': f"{auth['token_type']} {auth['access_token']}"}
 
     # TODO: Fail and give users a message when the request to amadeus fails
-    # TODO: Also how likely is it to make it easier for users to input origin/destination (its unreasonable to expect ppl to know the airport codes)
     def find_flights(self, url: str) -> dict[str, str]:
         try:
             flight_results = requests.get(url, headers=self._get_headers(), timeout=30)
