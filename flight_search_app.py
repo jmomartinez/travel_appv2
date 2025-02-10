@@ -5,12 +5,19 @@ import textwrap
 import streamlit.components.v1 as components
 from AmadeusClient import AmadeusFlightSearch, FlightSearchParameters
 from datetime import datetime
-from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, _get_next_day_arrival_str, Segment
+from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, \
+    _get_next_day_arrival_str, Segment
 
 # <img src="https://via.placeholder.com/32" alt="Airline Logo" style="width: 32px; height: 32px; margin-right: 10px;">
 # <div style="background-color: #0066ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">Best</div>
 
 def group_segments_by_major_stop(segments: list, major_stops) -> dict[str, list[Segment]]:
+    """
+    Groups flight segments into legs based on the occurrence of major stop airports.
+    :param segments: A list of Segment objects representing individual flight segments.
+    :param major_stops: A collection (e.g., list) of airport codes considered as major stops.
+    :return: A dictionary where keys are leg identifiers (e.g., "leg_1") and values are lists of Segment objects.
+    """
     segments = sorted(segments, key=lambda seg: seg.departure_time)
     current_leg, flight_legs = [], dict()
     for seg in segments:
@@ -25,20 +32,16 @@ def group_segments_by_major_stop(segments: list, major_stops) -> dict[str, list[
 
 def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[str, str]) -> None:
     """
-    Render a flight card with the same styling as the provided example.
-
-    Supports:
-      - One-way flights: The offer is a dict of flight segments.
-      - Round-trip / Multi-city flights: The offer has an "itineraries" key containing a list of itineraries.
-
-    The function normalizes one-way offers by wrapping them in a list so that the same rendering
-    logic applies to all cases.
+    Renders an HTML flight card displaying summarized flight details and pricing information.
+    :param flight_legs: Dictionary mapping leg identifiers to lists of Segment objects.
+    :param carriers: Dictionary mapping carrier codes to carrier names.
+    :return: None.
     """
     left_html = ""
     for leg_key, leg in flight_legs.items():
         num_stops = len(leg) - 1
         stops_str = "Nonstop" if num_stops == 0 else f"{num_stops} Stop{'s' if num_stops != 1 else ''}"
-        # Format times, duration, and route using your helper functions.
+        # Format times, duration, and route using helper functions.
         departure_time_str = get_flight_time(leg[0].departure_time)
         arrival_time_str = get_flight_time(leg[-1].arrival_time)
 
@@ -105,42 +108,55 @@ def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[st
     """)
     components.html(card_html, height=get_card_height(len(flight_legs)))
 
+
 def display_collapsable_card(flight_legs: dict[str, list[Segment]], carriers: dict[str, str]) -> None:
+    """
+    Displays detailed flight segment information in a collapsible card (using a Streamlit expander).
+    :param flight_legs: Dictionary mapping leg identifiers to lists of Segment objects.
+    :param carriers: Dictionary mapping carrier codes to carrier names.
+    :return: None.
+    """
     with st.expander("Flight Details", expanded=False):
         for k, leg in flight_legs.items():
-                for i in range(len(leg)):
-                    current_flight = leg[i]
-                    airline = get_airline(current_flight.carrier_code, carriers)
-                    departure_time = get_flight_time(current_flight.departure_time)
-                    arrival_time = get_flight_time(current_flight.arrival_time)
-                    flight_duration = transform_duration_str(current_flight.flight_duration)
+            for i in range(len(leg)):
+                current_flight = leg[i]
+                airline = get_airline(current_flight.carrier_code, carriers)
+                departure_time = get_flight_time(current_flight.departure_time)
+                arrival_time = get_flight_time(current_flight.arrival_time)
+                flight_duration = transform_duration_str(current_flight.flight_duration)
+                st.markdown(
+                    f"""
+                    <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #555; border-radius: 5px; background-color: #333;">
+                        <p style="color: #aaa;">
+                            <b style="font-size: 14;">{current_flight.departure_airport} to {current_flight.arrival_airport}</b><br>
+                            {airline.title()} {current_flight.flight_number}<br>
+                            {departure_time} - {arrival_time} ({flight_duration})<br>
+                        </p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+                if i != len(leg) - 1:
+                    layover_duration = get_time_difference(current_flight.arrival_time, leg[i + 1].departure_time)
                     st.markdown(
                         f"""
                         <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #555; border-radius: 5px; background-color: #333;">
                             <p style="color: #aaa;">
-                                <b style="font-size: 14;">{current_flight.departure_airport} to {current_flight.arrival_airport}</b><br>
-                                {airline.title()} {current_flight.flight_number}<br>
-                                {departure_time} - {arrival_time} ({flight_duration})<br>
+                                <b> {layover_duration} • Change planes in {current_flight.arrival_airport}</b><br>
                             </p>
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
-                    if i != len(leg) - 1:
-                        layover_duration = get_time_difference(current_flight.arrival_time, leg[i+1].departure_time)
-                        st.markdown(
-                            f"""
-                            <div style="margin-bottom: 10px; padding: 10px; border: 1px solid #555; border-radius: 5px; background-color: #333;">
-                                <p style="color: #aaa;">
-                                    <b> {layover_duration} • Change planes in {current_flight.arrival_airport}</b><br>
-                                </p>
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
 
 
 def get_time_difference(start_str: str, end_str: str) -> str:
+    """
+    Calculates the time difference between two datetime strings.
+    :param start_str: Start time as a string in the format "%Y-%m-%dT%H:%M:%S".
+    :param end_str: End time as a string in the same format.
+    :return: A string representing the time difference (e.g., "2h 15m" or "45m").
+    """
     start_dt = datetime.strptime(start_str, "%Y-%m-%dT%H:%M:%S")
     end_dt = datetime.strptime(end_str, "%Y-%m-%dT%H:%M:%S")
 
@@ -155,13 +171,31 @@ def get_time_difference(start_str: str, end_str: str) -> str:
     else:
         return f"{hours}h {minutes}m"
 
+
 def get_card_height(leg_num: int) -> int:
+    """
+    Calculates the height for the flight card based on the number of legs.
+    :param leg_num: Number of flight legs.
+    :return: Calculated height in pixels as an integer.
+    """
     base_height = 150
     additional_height_per_segment = 90
     return base_height + additional_height_per_segment * (leg_num - 1)
 
-def fetch_flights(search_type, origin, destination, departure_date, return_date, search_range, direction):
-    # Adjust parameters based on search type
+
+def fetch_flights(search_type: str, origin: str, destination: str, departure_date, return_date, search_range: int,
+                  direction: str) -> dict:
+    """
+    Fetches flight search results using the AmadeusFlightSearch client based on user input parameters.
+    :param search_type: Type of search (e.g., "Simple Search", "Unidirectional Wide Search", "Bidirectional Wide Search").
+    :param origin: Origin airport code.
+    :param destination: Destination airport code.
+    :param departure_date: Departure date as a datetime object.
+    :param return_date: Return date as a datetime object (if applicable).
+    :param search_range: Search range in days for wide searches (if applicable).
+    :param direction: Direction indicator for wide search ("Earlier" or "Later") if applicable.
+    :return: A dictionary containing the flight search results.
+    """
     params = FlightSearchParameters(
         api_key=st.secrets["prod"]["AMADEUS_PROD_API_KEY"],
         api_secret=st.secrets["prod"]["AMADEUS_PROD_API_SECRET"],
@@ -190,19 +224,38 @@ def fetch_flights(search_type, origin, destination, departure_date, return_date,
         st.error('Something went wrong. Perhaps the airport codes are invalid?')
     return results
 
+
 def input_departure_date_check(departure_date: datetime) -> None:
-    # Validate the departure date
+    """
+    Validates that the departure date is not in the past.
+    :param departure_date: Departure date as a datetime object.
+    :return: None. Displays an error and stops execution if the date is in the past.
+    """
     if departure_date < datetime.now().date():
         st.error("Departure Date cannot be in the past. Please select a valid date.")
         st.stop()  # Stop execution until the user provides a valid date
 
+
 def input_return_after_departure_check(departure_date: datetime, return_date: datetime) -> None:
-    # Validate the return date
+    """
+    Validates that the return date is not before the departure date.
+    :param departure_date: Departure date as a datetime object.
+    :param return_date: Return date as a datetime object.
+    :return: None. Displays an error and stops execution if the return date is before the departure date.
+    """
     if return_date and return_date < departure_date:
         st.error("Return Date cannot be before the Departure Date. Please select a valid date.")
         st.stop()  # Stop execution until the user provides a valid date
 
+
 def update_major_stops(major_stops: list, alternative_airports: dict, locations: dict) -> list[str]:
+    """
+    Updates the list of major stop airport codes by incorporating alternative airport codes for given cities.
+    :param major_stops: List of initial major stop airport codes.
+    :param alternative_airports: Dictionary mapping city codes to alternative airport codes.
+    :param locations: Dictionary containing location details keyed by airport code.
+    :return: An updated list of major stop airport codes.
+    """
     updated_stop = major_stops.copy()
     for stop in major_stops:
         city_code = locations[stop]['cityCode']
@@ -211,16 +264,28 @@ def update_major_stops(major_stops: list, alternative_airports: dict, locations:
             updated_stop.extend(alternative_airports[city_code])
     return updated_stop
 
+
 def get_alternative_airport_codes(airport_city_map: dict) -> dict:
+    """
+    Generates a mapping of city codes to alternative airport codes based on the airport-city data.
+    :param airport_city_map: Dictionary mapping airport identifiers to their details (including cityCode).
+    :return: A dictionary mapping city codes to alternative airport codes or lists of codes.
+    """
     alternative_airports = dict()
-    for k,v in airport_city_map.items():
+    for k, v in airport_city_map.items():
         if v['cityCode'] in alternative_airports.keys():
             alternative_airports[v['cityCode']] = [k, alternative_airports[v['cityCode']]]
         else:
             alternative_airports[v['cityCode']] = k
     return alternative_airports
 
+
 def group_airports_by_municipality(airport_data: list[dict]) -> dict:
+    """
+    Groups airport data by municipality and country for easier lookup.
+    :param airport_data: List of dictionaries containing airport details.
+    :return: A dictionary mapping "Municipality, Country" strings to aggregated airport information.
+    """
     city_airport_data = dict()
     for airport_details in airport_data:
         new_key_name = f"{airport_details['municipality']}, {airport_details['country_code']}"
@@ -229,34 +294,70 @@ def group_airports_by_municipality(airport_data: list[dict]) -> dict:
             city_airport_data[new_key_name]['airport_names'].append(airport_details.get('name'))
             city_airport_data[new_key_name]['country_codes'].append(airport_details.get('country_code'))
         else:
-            temp_dict = {'iata_codes': [airport_details.get('iata_code')], 'airport_names': [airport_details.get('name')], 'country_codes': [airport_details.get('country_code')]}
+            temp_dict = {
+                'iata_codes': [airport_details.get('iata_code')],
+                'airport_names': [airport_details.get('name')],
+                'country_codes': [airport_details.get('country_code')]
+            }
             city_airport_data[new_key_name] = temp_dict
     return city_airport_data
 
+
 def simple_string_comparison(string1: str, string2: str) -> float:
+    """
+    Compares two strings using a fuzzy token set ratio to determine similarity.
+    :param string1: The first string.
+    :param string2: The second string.
+    :return: A float representing the similarity score between the two strings.
+    """
     return fuzz.token_set_ratio(string1, string2, processor=utils.default_process)
 
-def get_city_airport_suggestions(query: str, city_airport_data: dict, threshold: float):
+
+def get_city_airport_suggestions(query: str, city_airport_data: dict, threshold: float) -> dict:
+    """
+    Filters city-airport data based on a fuzzy match with the query string.
+    :param query: The search query string.
+    :param city_airport_data: Dictionary mapping city names to airport details.
+    :param threshold: Minimum similarity score required to consider a match.
+    :return: Dictionary of city-airport suggestions that meet or exceed the threshold.
+    """
     suggestions = dict()
     for city, airport_stuff in city_airport_data.items():
         if simple_string_comparison(query, city) >= threshold:
             suggestions.update({city: airport_stuff})
     return suggestions
 
+
 def aggregate_airport_suggestions(suggestions: dict) -> dict[str, str]:
+    """
+    Aggregates airport suggestions into a dictionary mapping formatted suggestion strings to IATA codes.
+    :param suggestions: Dictionary of suggested city-airport entries.
+    :return: A dictionary where each key is a formatted string (e.g., "Airport Name, Country (IATA)") and each value is the IATA code.
+    """
     suggested_iata_codes = [airport for v in suggestions.values() for airport in v['iata_codes']]
     suggested_country_codes = [airport for v in suggestions.values() for airport in v['country_codes']]
     suggested_airports = [airport for v in suggestions.values() for airport in v['airport_names']]
     airport_suggestions = list(zip(suggested_airports, suggested_country_codes, suggested_iata_codes))
-    return dict(zip([f"{airport}, {country} ({iata})" for airport, country, iata in airport_suggestions], suggested_iata_codes))
+    return dict(
+        zip([f"{airport}, {country} ({iata})" for airport, country, iata in airport_suggestions], suggested_iata_codes))
 
-def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict):
+
+def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict) -> None:
+    """
+    Validates the user's airport input. If the input directly matches a key in the provided dictionary, it is accepted;
+    otherwise, it presents suggested cities based on fuzzy matching.
+    :param user_input: The airport input provided by the user.
+    :param city_airport_data: Dictionary containing city-to-airport mapping data.
+    :param full_airport_to_iata: Dictionary mapping full airport strings to their IATA codes.
+    :return: The validated airport code or selected suggestion.
+    """
     if user_input:
         if user_input in full_airport_to_iata.keys():
             st.write(f"Selected Airport: {full_airport_to_iata[user_input.upper()]}")
             return user_input
         else:
-            suggestions = get_city_airport_suggestions(query=user_input, city_airport_data=city_airport_data, threshold=90)
+            suggestions = get_city_airport_suggestions(query=user_input, city_airport_data=city_airport_data,
+                                                       threshold=90)
             final_airport_suggestions = aggregate_airport_suggestions(suggestions)
 
             if final_airport_suggestions:
@@ -267,16 +368,14 @@ def check_user_airport_input(user_input: str, city_airport_data: dict, full_airp
             else:
                 st.write("No matching airport found. Perhaps you misspelled it?")
 
-def main():
-    with open('data/airports_data.json', 'r') as infile:
-        airport_data = json.load(infile)
-    full_airport_to_iata = {details['iata_code']: f"{details['name']}, {details['country_code']} ({details['iata_code']})" for details in airport_data}
-    city_airport_data = group_airports_by_municipality(airport_data)
 
-    st.title("Flight Search Engine")
-    st.header("Search Flights")
-
-    # TODO: Add a check here in case the user inputs no origin or destination
+def get_flight_search_parameters(city_airport_data: dict, full_airport_to_iata: dict) -> tuple:
+    """
+    Collects flight search parameters from the user and validates airport inputs.
+    :param city_airport_data: Dictionary mapping city names to airport details.
+    :param full_airport_to_iata: Dictionary mapping full airport strings to IATA codes.
+    :return: A tuple containing the origin, destination, departure date, return date, and major stops.
+    """
     origin = st.text_input("From? (City or Airport Code)").upper()
     origin = check_user_airport_input(origin, city_airport_data, full_airport_to_iata)
 
@@ -292,51 +391,94 @@ def main():
         input_departure_date_check(departure_date)
     if departure_date and return_date:
         input_return_after_departure_check(departure_date, return_date)
+    return origin, destination, departure_date, return_date, major_stops
 
-    # Dropdown to select search type
-    search_type = st.selectbox(
-        "Select Search Type",
-        options=["Simple Search", "Unidirectional Wide Search", "Bidirectional Wide Search"]
-    )
+
+def check_minimum_search_info(origin, destination, departure_date) -> None:
+    """
+    Ensures that the minimum required search information (origin, destination, departure date) is provided.
+    :param origin: The origin airport code.
+    :param destination: The destination airport code.
+    :param departure_date: The departure date.
+    :return: None. Displays an error and stops execution if any required field is missing.
+    """
+    if not origin or not destination:
+        st.error("No origin or destination provided. Please enter a valid city name or airport code.")
+        st.stop()
+    if not departure_date:
+        st.error("No departure date provided. Please enter a valid departure date.")
+        st.stop()
+
+
+def display_simple_search_results(search_results: dict, major_stops: list[str]) -> None:
+    """
+    Processes and displays flight search results using a simple search format.
+    :param search_results: Dictionary containing flight search results and associated dictionaries.
+    :param major_stops: List of major stop airport codes.
+    :return: None.
+    """
+    try:
+        alternative_airports = get_alternative_airport_codes(search_results['dictionaries']['locations'])
+        updated_major_stops = update_major_stops(major_stops, alternative_airports,
+                                                 search_results['dictionaries']['locations'])
+        if search_results.get("data") and search_results.get('dictionaries'):
+            flight_offers = parse_flight_offers(search_results)
+            for offer_key, flight_offer in flight_offers.items():
+                flight_legs = group_segments_by_major_stop(segments=list(flight_offer.values()),
+                                                           major_stops=updated_major_stops)
+                display_flight_card(flight_legs, carriers=search_results['dictionaries']['carriers'])
+                display_collapsable_card(flight_legs, carriers=search_results['dictionaries']['carriers'])
+        else:
+            st.error("No flight data available.")
+    except Exception as e:
+        st.error(f"Uh oh something went wrong. Error for the nerds: {e}")
+        st.stop()
+
+
+def main():
+    """
+    Main function to run the Flight Search Engine application.
+
+    - Loads airport data from a JSON file.
+    - Prepares airport mappings for lookup.
+    - Collects user input for origin, destination, and travel dates.
+    - Initiates flight search based on the selected search type.
+    - Displays flight search results.
+
+    :return: None.
+    """
+    with open('data/airports_data.json', 'r') as infile:
+        airport_data = json.load(infile)
+    full_airport_to_iata = {
+        details['iata_code']: (f"{details['name']}, {details['country_code']} ({details['iata_code']})")
+        for details in airport_data
+    }
+    city_airport_data = group_airports_by_municipality(airport_data)
+
+    st.title("Flight Search Engine")
+    st.header("Search Flights")
+
+    origin, destination, departure_date, return_date, major_stops = get_flight_search_parameters(city_airport_data,
+                                                                                                 full_airport_to_iata)
+
+    search_type = st.selectbox("Select Search Type", options=["Simple Search", "Unidirectional Wide Search (WIP)",
+                                                              "Bidirectional Wide Search (WIP)"])
 
     search_range, direction = None, None
     if search_type == "Unidirectional Wide Search":
         search_range = st.number_input("Search Range (in days)", min_value=1, step=1)
         direction = st.selectbox("Direction", options=["Earlier", "Later"])
-
     elif search_type == "Bidirectional Wide Search":
         search_range = st.number_input("Search Range (in days)", min_value=1, step=1)
 
     if st.button("Search Flights"):
-        if not origin or not destination:
-            st.error("No origin or destination provided. Please enter a valid city name or airport code.")
-            st.stop()
-        if not departure_date:
-            st.error("No departure date provided. Please enter a valid departure date.")
-            st.stop()
+        check_minimum_search_info(origin, destination, departure_date)
+        if search_type == 'Simple Search':
+            st.write("Finding the cheapest flights, hang tight!")
+            search_results = fetch_flights(search_type, origin, destination, departure_date, return_date, search_range,
+                                           direction)
+            display_simple_search_results(search_results, major_stops)
 
-        try:
-            st.write("Fetching flights...")
-            search_results = fetch_flights(search_type, origin, destination, departure_date, return_date, search_range, direction)
-            alternative_airports = get_alternative_airport_codes(search_results['dictionaries']['locations'])
-            updated_major_stops = update_major_stops(major_stops, alternative_airports, search_results['dictionaries']['locations'])
-            st.write("Flight results received...")
-
-            if search_type == 'Simple Search':
-                st.write("Entering Simple Search Flow...")
-                if "data" in search_results and 'dictionaries' in search_results:
-                    flight_offers = parse_flight_offers(search_results)
-                    for i, (offer_key, flight_offer) in enumerate(flight_offers.items()):
-                        flight_legs = group_segments_by_major_stop(segments=list(flight_offer.values()), major_stops=updated_major_stops)
-                        display_flight_card(flight_legs, carriers=search_results['dictionaries']['carriers'])
-                        display_collapsable_card(flight_legs, carriers=search_results['dictionaries']['carriers'])
-                else:
-                    st.error("No flight data available.")
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            st.stop()
 
 if __name__ == '__main__':
     main()
-
-
