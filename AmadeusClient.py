@@ -59,7 +59,7 @@ class AmadeusFlightSearch:
             raise SystemExit(f"Failed to make the request.\nResponse Body: {auth.text}")
         return auth.json()
 
-    def make_search_url(self, departure_date: datetime, return_date: datetime) -> str:
+    def make_search_url(self, departure_date: datetime, return_date: datetime | str) -> str:
         # TODO: Expose the most used parameters as needed
         search_params = {
             'originLocationCode': self.search_params.origin,
@@ -87,7 +87,6 @@ class AmadeusFlightSearch:
         auth = self._get_access_token()
         return {'Authorization': f"{auth['token_type']} {auth['access_token']}"}
 
-    # TODO: Fail and give users a message when the request to amadeus fails
     def find_flights(self, url: str) -> dict[str, str]:
         try:
             flight_results = requests.get(url, headers=self._get_headers(), timeout=30)
