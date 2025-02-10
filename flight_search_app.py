@@ -442,11 +442,10 @@ def main():
     elif search_type == "Bidirectional Wide Search":
         search_range = st.number_input("Search Range (in days)", min_value=1, step=1)
 
-    with st.spinner():
+    with st.spinner(text='Finding the cheapest flights, hang tight!'):
         if st.button("Search Flights"):
             confirm_origin_and_destination_provided(origin, destination)
             if search_type == 'Simple Search':
-                st.write("Finding the cheapest flights, hang tight!")
                 search_results = fetch_flights(search_type, origin, destination, departure_date, return_date,
                                                num_of_passengers, search_range, direction)
                 display_simple_search_results(search_results, major_stops)
