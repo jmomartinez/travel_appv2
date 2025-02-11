@@ -29,6 +29,10 @@ def group_segments_by_major_stop(segments: list, major_stops) -> dict[str, list[
         flight_legs['remaining_leg'] = current_leg
     return flight_legs
 
+def get_next_day_arrival_str(departure_time: str, arrival_time: str) -> str:
+    departure_time = datetime.strptime(departure_time, "%Y-%m-%dT%H:%M:%S")
+    arrival_time = datetime.strptime(arrival_time, "%Y-%m-%dT%H:%M:%S")
+    return f"+{(arrival_time - departure_time).days}"
 
 def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[str, str]) -> None:
     """
@@ -45,7 +49,7 @@ def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[st
         departure_time_str = get_flight_time(leg[0].departure_time)
         arrival_time_str = get_flight_time(leg[-1].arrival_time)
 
-        next_day_str = ''
+        next_day_str = get_next_day_arrival_str(departure_time=leg[0].departure_time, arrival_time=leg[-1].arrival_time)
         duration_str = transform_duration_str(leg[0].total_duration)
         route_str = f"{leg[0].departure_airport} – {leg[-1].arrival_airport}"
 
@@ -172,13 +176,13 @@ def get_time_difference(start_str: str, end_str: str) -> str:
         return f"{hours}h {minutes}m"
 
 
-def get_card_height(leg_num: int) -> int:
+def get_card_height(leg_num: int, base_height: int = 150) -> int:
     """
     Calculates the height for the flight card based on the number of legs.
+    :param base_height: base height in pixels.
     :param leg_num: Number of flight legs.
     :return: Calculated height in pixels as an integer.
     """
-    base_height = 150
     additional_height_per_segment = 90
     return base_height + additional_height_per_segment * (leg_num - 1)
 
