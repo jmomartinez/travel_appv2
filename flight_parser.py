@@ -45,14 +45,6 @@ def get_airline(carrier_code: str, carriers: dict[str, str]) -> str:
 def get_aircraft(aircraft_code: str, aircrafts: dict[str, str]) -> str:
     return aircrafts[aircraft_code]
 
-# This doesn't do what you want. It only returns if greater than 24 hrs but that doesn't matter.
-# What matters is if you fly out one day and land in a different day in the local destination time zone, For now this will not be called, figure out some logic to make it work before calling again.
-def _get_next_day_arrival_str(total_duration: str):
-    match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?', total_duration)
-    hours = int(match.group(1))
-    return f"+{hours // 24}" if hours >=24 else ''
-
-
 def parse_flight_offers(flight_results: dict) -> dict[str, dict[str, Segment]]:
     flight_offers = {}
     for flight_offer in flight_results['data']:

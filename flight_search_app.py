@@ -5,8 +5,7 @@ import textwrap
 import streamlit.components.v1 as components
 from AmadeusClient import AmadeusFlightSearch, FlightSearchParameters
 from datetime import datetime, timedelta
-from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, \
-    _get_next_day_arrival_str, Segment
+from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, Segment
 
 # <img src="https://via.placeholder.com/32" alt="Airline Logo" style="width: 32px; height: 32px; margin-right: 10px;">
 # <div style="background-color: #0066ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">Best</div>
