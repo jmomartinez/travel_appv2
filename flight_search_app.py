@@ -31,7 +31,8 @@ def group_segments_by_major_stop(segments: list, major_stops) -> dict[str, list[
 def get_next_day_arrival_str(departure_time: str, arrival_time: str) -> str:
     departure_time = datetime.strptime(departure_time, "%Y-%m-%dT%H:%M:%S")
     arrival_time = datetime.strptime(arrival_time, "%Y-%m-%dT%H:%M:%S")
-    return f"+{(arrival_time - departure_time).days}"
+    day_measure = (arrival_time - departure_time).days
+    return f"+{day_measure}" if day_measure > 0 else ''
 
 def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[str, str]) -> None:
     """
@@ -408,7 +409,7 @@ def display_simple_search_results(search_results: dict, major_stops: list[str]) 
         st.exception(f"Uh oh something went wrong. Error for the nerds: {e}")
         st.stop()
 
-
+# For the plots consider using plotly if the streamlit plots are insufficient
 def main():
     """
     Main function to run the Flight Search Engine application.
