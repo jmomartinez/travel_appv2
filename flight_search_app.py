@@ -1,11 +1,14 @@
 import json
 import streamlit as st
-from rapidfuzz import fuzz, utils
+from rapidfuzz import fuzz, utils, process
 import textwrap
 import streamlit.components.v1 as components
 from AmadeusClient import AmadeusFlightSearch, FlightSearchParameters
 from datetime import datetime, timedelta
 from flight_parser import parse_flight_offers, transform_duration_str, get_flight_time, get_airline, get_aircraft, Segment
+from geopy.geocoders import Nominatim, Bing
+import numpy as np
+from sklearn.neighbors import BallTree
 
 # <img src="https://via.placeholder.com/32" alt="Airline Logo" style="width: 32px; height: 32px; margin-right: 10px;">
 # <div style="background-color: #0066ff; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px;">Best</div>
@@ -277,39 +280,16 @@ def group_airports_by_municipality(airport_data: list[dict]) -> dict:
             city_airport_data[new_key_name]['iata_codes'].append(airport_details.get('iata_code'))
             city_airport_data[new_key_name]['airport_names'].append(airport_details.get('name'))
             city_airport_data[new_key_name]['country_codes'].append(airport_details.get('country_code'))
+            city_airport_data[new_key_name]['region_name'].append(airport_details.get('region_name'))
         else:
             temp_dict = {
                 'iata_codes': [airport_details.get('iata_code')],
                 'airport_names': [airport_details.get('name')],
-                'country_codes': [airport_details.get('country_code')]
+                'country_codes': [airport_details.get('country_code')],
+                'region_name': [airport_details.get('region_name')]
             }
             city_airport_data[new_key_name] = temp_dict
     return city_airport_data
-
-
-def simple_string_comparison(string1: str, string2: str) -> float:
-    """
-    Compares two strings using a fuzzy token set ratio to determine similarity.
-    :param string1: The first string.
-    :param string2: The second string.
-    :return: A float representing the similarity score between the two strings.
-    """
-    return fuzz.token_set_ratio(string1, string2, processor=utils.default_process)
-
-
-def get_city_airport_suggestions(query: str, city_airport_data: dict, threshold: float) -> dict:
-    """
-    Filters city-airport data based on a fuzzy match with the query string.
-    :param query: The search query string.
-    :param city_airport_data: Dictionary mapping city names to airport details.
-    :param threshold: Minimum similarity score required to consider a match.
-    :return: Dictionary of city-airport suggestions that meet or exceed the threshold.
-    """
-    suggestions = dict()
-    for city, airport_stuff in city_airport_data.items():
-        if simple_string_comparison(query, city) >= threshold:
-            suggestions.update({city: airport_stuff})
-    return suggestions
 
 
 def aggregate_airport_suggestions(suggestions: dict) -> dict[str, str]:
@@ -325,14 +305,91 @@ def aggregate_airport_suggestions(suggestions: dict) -> dict[str, str]:
     return dict(
         zip([f"{airport}, {country} ({iata})" for airport, country, iata in airport_suggestions], suggested_iata_codes))
 
+def get_municipality_coordinates(municipality: str) -> tuple[float, float]:
+    geolocator = Bing(api_key=st.secrets["prod"]["BING_API_KEY"])
+    location = geolocator.geocode(municipality)
+    if not location:
+        raise ValueError(f"Could not find coordinates for '{municipality}'")
+    return location.latitude, location.longitude
 
-def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict) -> str:
+def get_unique_municipalities(airport_data: dict) -> list[str]:
+    return list(set([sub_dict['municipality'] for sub_dict in airport_data]))
+
+def fuzzy_municipality_comparison(user_input: str, municipalities: list[str], threshold: int = 60) -> str:
+    city_match, score, _ = process.extractOne(user_input, municipalities, scorer=fuzz.token_sort_ratio, processor=utils.default_process)
+    if city_match and score >= threshold:
+        return city_match
+    else:
+        st.error("No matching city found, perhaps you misspelled it?")
+        st.stop()
+
+def find_nearby_airports_from_coords(all_coords: list[tuple[float, float]], target_coord: tuple[float, float], radius_miles: int) -> list[tuple[float, float]]:
+    """
+    Given a list of coordinates (latitude, longitude in degrees) and a target coordinate,
+    return all coordinates within the specified radius in miles.
+
+    Parameters:
+        all_coords (list of tuple): [(lat, lon), ...]
+        target_coord (tuple): (lat, lon) of target
+        radius_miles (float): radius in miles to search within
+
+    Returns:
+        list of tuple: coordinates within the radius
+    """
+    # Convert coordinates from degrees to radians
+    coords_rad = np.radians(all_coords)
+    target_rad = np.radians(np.array(target_coord).reshape(1, -1))
+
+    # Earth's radius in miles
+    earth_radius_miles = 3959.0
+    # Convert radius in miles to radians
+    radius_rad = radius_miles / earth_radius_miles
+
+    # Build the BallTree using haversine distance
+    tree = BallTree(coords_rad, metric='haversine')
+    # Query the tree for indices of points within the given radius (in radians)
+    indices = tree.query_radius(target_rad, r=radius_rad)
+
+    # indices is an array of arrays; extract the first array (for our one target)
+    nearby_coords = np.array(all_coords)[indices[0]]
+    return nearby_coords.tolist()
+
+def match_actual_coords(coords_list, airport_dicts, tol=1e-5):
+    """
+    For each coordinate in coords_list, check if it matches (within a tolerance)
+    any airport in airport_dicts based on latitude_deg and longitude_deg.
+
+    Parameters:
+        coords_list (list of [lat, lon]): List of coordinate pairs (in degrees).
+        airport_dicts (list of dict): Each dict has keys 'latitude_deg', 'longitude_deg', 'name', etc.
+        tol (float): Tolerance for matching the latitude and longitude.
+
+    Returns:
+        dict: Mapping from coordinate tuple to airport name (or None if no match).
+    """
+    matches = {}
+    for coord in coords_list:
+        lat, lon = coord
+        matched_airport = None
+        for airport in airport_dicts:
+            airport_lat = airport.get('latitude_deg')
+            airport_lon = airport.get('longitude_deg')
+            if (abs(lat - airport_lat) < tol) and (abs(lon - airport_lon) < tol):
+                matched_airport = airport.get('name')
+                break
+        matches[tuple(coord)] = matched_airport
+    return matches
+
+def check_user_airport_input(user_input: str, city_airport_data: dict, full_airport_to_iata: dict,
+                             unique_municipalities: list[str], airport_coordinates: list[tuple[float, float]], full_airport_data: list[dict]) -> str:
     """
     Validates the user's airport input. If the input directly matches a key in the provided dictionary, it is accepted;
     otherwise, it presents suggested cities based on fuzzy matching.
+    :param airport_coordinates: list of airport coordinates
     :param user_input: The airport input provided by the user.
     :param city_airport_data: Dictionary containing city-to-airport mapping data.
     :param full_airport_to_iata: Dictionary mapping full airport strings to their IATA codes.
+    :param unique_municipalities: list of unique municipalities.
     :return: The validated airport code or selected suggestion.
     """
     if user_input:
@@ -340,8 +397,18 @@ def check_user_airport_input(user_input: str, city_airport_data: dict, full_airp
             st.write(f"Selected Airport: {full_airport_to_iata[user_input.upper()]}")
             return user_input
         else:
-            suggestions = get_city_airport_suggestions(query=user_input, city_airport_data=city_airport_data,
-                                                       threshold=90)
+            city = fuzzy_municipality_comparison(user_input, unique_municipalities)
+            city_coords = get_municipality_coordinates(city)
+
+            nearby_airport_coords = find_nearby_airports_from_coords(airport_coordinates, city_coords, radius_miles=25)
+            matches = match_actual_coords(nearby_airport_coords, full_airport_data, tol=1e-5)
+            airport_matches = list(matches.values())
+
+            suggestions = dict()
+            for city, airport_stuff in city_airport_data.items():
+                for airport in airport_stuff.get('airport_names'):
+                    if airport in airport_matches:
+                        suggestions.update({city: airport_stuff})
             final_airport_suggestions = aggregate_airport_suggestions(suggestions)
 
             if final_airport_suggestions:
@@ -353,19 +420,24 @@ def check_user_airport_input(user_input: str, city_airport_data: dict, full_airp
                 st.write("No matching airport found. Perhaps you misspelled it?")
 
 
-def get_flight_search_parameters(city_airport_data: dict, full_airport_to_iata: dict) -> tuple:
+def get_flight_search_parameters(city_airport_data: dict, full_airport_to_iata: dict,
+                                 unique_municipalities: list, airport_coordinates: list[tuple[float, float]],
+                                 full_airport_data: list[dict]) -> tuple:
     """
     Collects flight search parameters from the user and validates airport inputs.
+    :param full_airport_data:
+    :param unique_municipalities:
+    :param airport_coordinates:
     :param city_airport_data: Dictionary mapping city names to airport details.
     :param full_airport_to_iata: Dictionary mapping full airport strings to IATA codes.
     :return: A tuple containing the origin, destination, departure date, return date, and major stops.
     """
     # TODO: Look into the autocomplete parameter for text inputs
     origin = st.text_input("From? (City or Airport Code)").upper()
-    origin = check_user_airport_input(origin, city_airport_data, full_airport_to_iata)
+    origin = check_user_airport_input(origin, city_airport_data, full_airport_to_iata, unique_municipalities, airport_coordinates, full_airport_data)
 
     destination = st.text_input("To? (City or Airport Code)").upper()
-    destination = check_user_airport_input(destination, city_airport_data, full_airport_to_iata)
+    destination = check_user_airport_input(destination, city_airport_data, full_airport_to_iata, unique_municipalities, airport_coordinates, full_airport_data)
 
     departure_date = st.date_input("Departure Date", value='today', min_value='today')
     return_date = st.date_input("Return Date (Optional)", value=None, min_value=departure_date + timedelta(days=1))
@@ -429,12 +501,17 @@ def main():
         for details in airport_data
     }
     city_airport_data = group_airports_by_municipality(airport_data)
+    unique_municipalities = get_unique_municipalities(airport_data)
+    airport_coordinates = [(data.get('latitude_deg'), data.get('longitude_deg')) for data in airport_data
+                  if data.get('longitude_deg') and data.get('latitude_deg')]
 
     st.title("Flight Search Engine")
     st.header("Search Flights")
 
     (origin, destination, departure_date, return_date,
-     num_of_passengers, major_stops) = get_flight_search_parameters(city_airport_data, full_airport_to_iata)
+     num_of_passengers, major_stops) = get_flight_search_parameters(city_airport_data, full_airport_to_iata,
+                                                                    unique_municipalities, airport_coordinates,
+                                                                    airport_data)
 
     search_type = st.selectbox("Select Search Type", options=["Simple Search", "Unidirectional Wide Search (WIP)",
                                                               "Bidirectional Wide Search (WIP)"])
