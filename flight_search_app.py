@@ -482,6 +482,7 @@ def display_simple_search_results(search_results: dict, major_stops: list[str]) 
         st.stop()
 
 # For the plots consider using plotly if the streamlit plots are insufficient
+# TODO: Crash the app when the amadeus search fails AND when there are no results
 def main():
     """
     Main function to run the Flight Search Engine application.
