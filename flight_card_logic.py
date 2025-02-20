@@ -15,6 +15,7 @@ def get_card_height(leg_num: int, base_height: int = 150) -> int:
     additional_height_per_segment = 90
     return base_height + additional_height_per_segment * (leg_num - 1)
 
+# <div style="font-size: 12px; color: #aaa;">Operated by LIST OF AIRLINES</div>
 def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[str, str]) -> None:
     """
     Renders an HTML flight card displaying summarized flight details and pricing information.
@@ -45,7 +46,6 @@ def display_flight_card(flight_legs: dict[str, list[Segment]], carriers: dict[st
                 </span>
             </div>
             <div style="font-size: 14px; margin-bottom: 5px;">{carrier_name}</div>
-            <div style="font-size: 12px; color: #aaa;">Operated by LIST OF AIRLINES</div>
             <div style="font-size: 12px; color: #aaa; margin-top: 5px;">
                 {stops_str} | {duration_str} | {route_str}
             </div>
