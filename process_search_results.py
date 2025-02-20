@@ -61,10 +61,8 @@ def create_flights_dataframe(flight_results: dict[str, any]) -> pd.DataFrame:
             itinerary_counter += 1
     return pd.DataFrame(rows)
 
-
 def _rename_code_cols(old_cols: list) -> dict:
     return dict(zip(old_cols, [col.replace('_code', '') for col in old_cols]))
-
 
 def parse_duration_values(date: str) -> any:
     if type(date) == float:
@@ -77,12 +75,10 @@ def parse_duration_values(date: str) -> any:
         except ValueError:
             return pd.NaT
 
-
 def add_num_of_stops(data: pd.DataFrame) -> pd.DataFrame:
     stop_columns = [col for col in data.columns if col.startswith("origin") and col != "origin_1"]
     data['num_of_stops'] = data[stop_columns].notna().sum(axis=1)
     return data
-
 
 def map_flight_metadata(flight_data: pd.DataFrame, flight_dictionaries: dict) -> pd.DataFrame:
     time_cols = [col for col in flight_data.columns if 'time' in col]
@@ -97,7 +93,6 @@ def map_flight_metadata(flight_data: pd.DataFrame, flight_dictionaries: dict) ->
 
     flight_data[time_cols] = flight_data[time_cols].apply(pd.to_datetime)
     return flight_data
-
 
 def write_bulk_results(bulk_results: pd.DataFrame, origin: str, destination: str, root: str = 'amadeus') -> None:
     flight_file_name = f"{datetime.now().strftime('%Y-%m-%d %H:%M')}_{origin}_{destination}.csv"

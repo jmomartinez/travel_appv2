@@ -1,22 +1,8 @@
 import operator
 import requests
 from datetime import datetime, timedelta
-from dataclasses import dataclass
 
-
-@dataclass
-class FlightSearchParameters:
-    api_key: str
-    api_secret: str
-    env: str
-    version: str
-    origin: str
-    destination: str
-    departure_date: str
-    adults_passengers: int
-    return_date: str = None
-    search_range: int = None
-    direction: str = None
+from flight_info import FlightSearchParameters
 
 class AmadeusFlightSearch:
     DATE_FORMAT = "%Y-%m-%d"
