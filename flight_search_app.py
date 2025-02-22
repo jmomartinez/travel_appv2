@@ -118,7 +118,7 @@ def get_flight_search_parameters(iata_to_airport: dict, airport_data: list[dict]
     return_date = st.date_input("Return Date (Optional)", value=None, min_value=departure_date + timedelta(days=1))
 
     num_of_passengers = st.number_input("Adult Passengers", value=1, min_value=1, max_value=20)
-    return origin, destination, departure_date, return_date, num_of_passengers, [origin, destination]
+    return origin, destination, departure_date, return_date, num_of_passengers
 
 
 def group_segments_by_major_stop(segments: list, major_stops: list) -> dict[str, list[Segment]]:
@@ -202,8 +202,8 @@ def main():
     st.title("Flight Search Engine")
     st.header("Search Flights")
 
-    (origin, destination, departure_date,
-     return_date, num_of_passengers, major_stops) = get_flight_search_parameters(iata_to_airport, airport_data)
+    (origin, destination, departure_date, return_date,
+     num_of_passengers) = get_flight_search_parameters(iata_to_airport, airport_data)
 
     search_type = st.selectbox("Select Search Type", options=["Simple Search",
                                                             "Unidirectional Wide Search (WIP)",
@@ -222,7 +222,7 @@ def main():
             if search_type == 'Simple Search':
                 search_results = fetch_flights(search_type, origin, destination, departure_date, return_date,
                                                num_of_passengers, search_range, direction)
-                display_simple_search_results(search_results, major_stops)
+                display_simple_search_results(search_results, major_stops=[origin, destination])
 
 
 if __name__ == '__main__':
